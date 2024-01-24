@@ -60,7 +60,7 @@ async function delCopy() {
       return console.error(err);
     }
   });
-  copyData();
+  copyData(source, destination);
 }
 
 function copyRes() {
