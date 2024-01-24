@@ -30,7 +30,7 @@ fs.readdir(dataStyle, { withFileTypes: true }, (err, files) => {
               for (let i = 0; i < arrStyles.length; i++) {
                 result.write(arrStyles[i]);
               }
-            }
+            },
           );
         }
       }

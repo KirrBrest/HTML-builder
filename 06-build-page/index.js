@@ -1,10 +1,10 @@
-const path = require("path");
-const fs = require("fs");
-const {promises: fsPromises} = require("fs");
+const path = require('path');
+const fs = require('fs');
+const { promises: fsPromises } = require('fs');
 
-// fs.mkdir(path.join(__dirname, "project-dist"), {recursive: true}, (err) => {
-//   if (err) throw err;
-// });
+fs.mkdir(path.join(__dirname, 'project-dist'), { recursive: true }, (err) => {
+  if (err) throw err;
+});
 
 const styles = path.join(__dirname, 'project-dist', 'style.css');
 const dataStyle = path.join(__dirname, 'styles');
@@ -30,7 +30,7 @@ fs.readdir(dataStyle, { withFileTypes: true }, (err, files) => {
               for (let i = 0; i < arrStyles.length; i++) {
                 result.write(arrStyles[i]);
               }
-            }
+            },
           );
         }
       }
@@ -38,12 +38,12 @@ fs.readdir(dataStyle, { withFileTypes: true }, (err, files) => {
   }
 });
 
-const destination = path.join(__dirname, "project-dist", "assets");
-const source = path.join(__dirname, "assets");
+const destination = path.join(__dirname, 'project-dist', 'assets');
+const source = path.join(__dirname, 'assets');
 
 fs.access(destination, function (error) {
   if (error) {
-    copyData();
+    copyRes();
   } else {
     delCopy();
   }
@@ -58,26 +58,32 @@ async function delCopy() {
   copyData();
 }
 
-function copyData() {
+function copyRes() {
+  fsPromises.mkdir(destination);
+  copyData(source, destination);
+}
+
+function copyData(data, dest) {
   fs.mkdir(destination, { recursive: true }, (err) => {
     if (err) {
       return console.error(err);
     }
-    fs.readdir(source, { withFileTypes: true }, (err, files) => {
+    fs.readdir(data, { withFileTypes: true }, (err, files) => {
       if (err) {
         console.log(err);
       } else {
         files.forEach((file) => {
           const fileName = file.name.toString();
-
-          fsPromises
-            .copyFile(
-              path.join(__dirname, "assets", fileName),
-              path.join(__dirname, "project-dist", fileName)
-            )
-            .catch(function (error) {
+          const dataPath = path.join(data, fileName);
+          const destPath = path.join(dest, fileName);
+          if (file.isDirectory()) {
+            fsPromises.mkdir(destPath, { recursive: true });
+            copyData(dataPath, destPath);
+          } else if (file.isFile()) {
+            fsPromises.copyFile(dataPath, destPath).catch(function (error) {
               console.log(error);
             });
+          }
         });
       }
     });
