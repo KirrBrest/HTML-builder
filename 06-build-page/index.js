@@ -89,3 +89,41 @@ function copyData(data, dest) {
     });
   });
 }
+
+const startHtml = fs.createReadStream(
+  path.join(__dirname, 'template.html'),
+  'utf-8',
+);
+// const finalHtml = fs.createWriteStream(
+//   path.join(__dirname, 'project-dist', 'index.html'),
+// );
+
+const finalHtml = path.join(__dirname, 'project-dist', 'index.html');
+
+let tempStr = '';
+const components = path.join(__dirname, 'components');
+
+startHtml.on('data', async (data) => {
+  tempStr = data;
+  fs.promises.readdir(components, { withFileTypes: true }).then((arr) => {
+    arr.forEach((item) => {
+      const [itemName, type] = item.name.split('.');
+      if (type === 'html') {
+        const itemSource = fs.createReadStream(
+          path.join(components, item.name),
+          'utf-8',
+        );
+        let itemData;
+        itemSource.on('data', (data) => {
+          itemData = data;
+          tempStr = tempStr.replace(`{{${itemName}}}`, itemData);
+          fs.writeFile(finalHtml, tempStr, (err) => {
+            if (err) {
+              console.log(err.message);
+            }
+          });
+        });
+      }
+    });
+  });
+});
