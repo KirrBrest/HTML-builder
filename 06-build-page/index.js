@@ -55,6 +55,11 @@ async function delCopy() {
       return console.error(err);
     }
   });
+  await fs.mkdir(destination, { recursive: true }, (err) => {
+    if (err) {
+      return console.error(err);
+    }
+  });
   copyData();
 }
 
@@ -64,30 +69,30 @@ function copyRes() {
 }
 
 function copyData(data, dest) {
-  fs.mkdir(destination, { recursive: true }, (err) => {
+  // fs.mkdir(destination, { recursive: true }, (err) => {
+  //   if (err) {
+  //     return console.error(err);
+  //   }
+  fs.readdir(data, { withFileTypes: true }, (err, files) => {
     if (err) {
-      return console.error(err);
+      console.log(err);
+    } else {
+      files.forEach((file) => {
+        const fileName = file.name.toString();
+        const dataPath = path.join(data, fileName);
+        const destPath = path.join(dest, fileName);
+        if (file.isDirectory()) {
+          fsPromises.mkdir(destPath, { recursive: true });
+          copyData(dataPath, destPath);
+        } else if (file.isFile()) {
+          fsPromises.copyFile(dataPath, destPath).catch(function (error) {
+            console.log(error);
+          });
+        }
+      });
     }
-    fs.readdir(data, { withFileTypes: true }, (err, files) => {
-      if (err) {
-        console.log(err);
-      } else {
-        files.forEach((file) => {
-          const fileName = file.name.toString();
-          const dataPath = path.join(data, fileName);
-          const destPath = path.join(dest, fileName);
-          if (file.isDirectory()) {
-            fsPromises.mkdir(destPath, { recursive: true });
-            copyData(dataPath, destPath);
-          } else if (file.isFile()) {
-            fsPromises.copyFile(dataPath, destPath).catch(function (error) {
-              console.log(error);
-            });
-          }
-        });
-      }
-    });
   });
+  // });
 }
 
 const startHtml = fs.createReadStream(
