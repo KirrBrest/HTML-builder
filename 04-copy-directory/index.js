@@ -1,10 +1,10 @@
 const path = require('path');
 const fs = require('fs');
 
-const {promises: fsPromises} = require("fs");
+const { promises: fsPromises } = require('fs');
 
-const destination = path.join(__dirname, "files-copy");
-const source = path.join(__dirname, "files");
+const destination = path.join(__dirname, 'files-copy');
+const source = path.join(__dirname, 'files');
 
 fs.access(destination, function (error) {
   if (error) {
@@ -37,14 +37,14 @@ function copyData() {
 
           fsPromises
             .copyFile(
-              path.join(__dirname, "files", fileName),
-              path.join(__dirname, "files-copy", fileName)
+              path.join(__dirname, 'files', fileName),
+              path.join(__dirname, 'files-copy', fileName),
             )
             .catch(function (error) {
               console.log(error);
             });
         });
-        console.log("Mission Complete");
+        console.log('Mission Complete');
       }
     });
   });
